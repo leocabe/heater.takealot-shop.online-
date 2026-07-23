@@ -5,7 +5,7 @@
    <!-- Utimfy Pixel Code -->
 
 <script>
-  window.pixelId = "69f3308425c7d3cc4f8da0a2";
+  window.pixelId = "6a0221fbb4d3d1b2ba05392b";
   var a = document.createElement("script");
   a.setAttribute("async", "");
   a.setAttribute("defer", "");
@@ -1653,6 +1653,67 @@
   fill: currentColor;
 }
 
+/* ===== CLEARANCE SALE BAR ===== */
+.clearance-strip{
+  background: #c92a2a;
+  color: #fff;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.clearance-icon{
+  width: 18px;
+  height: 18px;
+  color: #fff;
+  flex: 0 0 auto;
+}
+
+.clearance-icon svg{
+  width: 18px;
+  height: 18px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.clearance-text{
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: center;
+}
+
+.clearance-title{
+  font-weight: 800;
+  letter-spacing: .2px;
+  margin-right: 6px;
+}
+
+.clearance-sub{
+  font-weight: 500;
+}
+
+.clearance-timer{
+  flex: 0 0 auto;
+  background: rgba(0,0,0,.2);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .5px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
   </style>
 </head>
 
@@ -1689,6 +1750,22 @@
       </button>
     </div>
   </header>
+
+  <!-- CLEARANCE SALE BAR -->
+  <div class="clearance-strip" id="clearanceBar" aria-label="Clearance stock alert">
+    <span class="clearance-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L14.71 3.86a2 2 0 0 0-3.42 0Z"></path>
+        <path d="M12 9v4"></path>
+        <path d="M12 17h.01"></path>
+      </svg>
+    </span>
+    <span class="clearance-text">
+      <span class="clearance-title">CLEARANCE SALE</span>
+      <span class="clearance-sub">Only 8 units left, almost sold out</span>
+    </span>
+    <span class="clearance-timer" id="clearanceTimer" aria-label="Offer ends in">08:00:00</span>
+  </div>
 
   <!-- ETAPA 2: CORPO ACIMA DA DOBRA -->
   <div class="wrap">
@@ -1791,7 +1868,6 @@
 
   </div>
 </section>
-
 
   <!-- FREE DELIVERY WITH TAKEALOTMORE -->
 <section class="takealotmore">
@@ -2522,8 +2598,8 @@ document.addEventListener("keydown", (e) => {
 });
 
 
-// default selecionado (igual ao print)
-selectOffer(0);
+// default selecionado (igual ao print, só quando existem offer-cards)
+if(offerCards.length) selectOffer(0);
 
     // Inicial
     setActive(0);
@@ -2612,6 +2688,38 @@ selectOffer(0);
   el.textContent = isTomorrow ? "Get It Tomorrow!" : formatRange(start, end);
 })();
 
+// CLEARANCE SALE countdown (8h, persists across reloads, loops when it ends)
+(function(){
+  const timerEl = document.getElementById('clearanceTimer');
+  if (!timerEl) return;
+
+  const DURATION_MS = 8 * 60 * 60 * 1000;
+  const STORAGE_KEY = 'clearanceEndsAt';
+
+  let endsAt = Number(localStorage.getItem(STORAGE_KEY));
+  if (!endsAt || endsAt < Date.now()) {
+    endsAt = Date.now() + DURATION_MS;
+    localStorage.setItem(STORAGE_KEY, String(endsAt));
+  }
+
+  function pad(n){ return String(n).padStart(2, '0'); }
+
+  function tick(){
+    let remaining = endsAt - Date.now();
+    if (remaining <= 0) {
+      endsAt = Date.now() + DURATION_MS;
+      localStorage.setItem(STORAGE_KEY, String(endsAt));
+      remaining = DURATION_MS;
+    }
+    const h = Math.floor(remaining / 3600000);
+    const m = Math.floor((remaining % 3600000) / 60000);
+    const s = Math.floor((remaining % 60000) / 1000);
+    timerEl.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+  }
+
+  tick();
+  setInterval(tick, 1000);
+})();
 
   </script>
 </body>
